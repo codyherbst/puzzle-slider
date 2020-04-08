@@ -93,13 +93,15 @@ class Board extends React.Component {
     randomizeTiles() {
         let emptyTile = this.getEmptyTile()
 
-        for (let i = 0; i < 1; i++) {
-            let leftTile = this.getTileByPos(this.state.tiles, emptyTile.position - 1)
-            let rightTile = this.getTileByPos(this.state.tiles, emptyTile.position + 1)
-            let topTile = this.getTileByPos(this.state.tiles, emptyTile.position - 4)
-            let botTile = this.getTileByPos(this.state.tiles, emptyTile.position + 4)
+        for (let i = 0; i < 100; i++) {
 
-            let randomTiles = [leftTile, rightTile, topTile, botTile]
+            let randomTiles = [
+                this.getTileByPos(this.state.tiles, emptyTile.position - 1),
+                this.getTileByPos(this.state.tiles, emptyTile.position + 1),
+                this.getTileByPos(this.state.tiles, emptyTile.position - 4),
+                this.getTileByPos(this.state.tiles, emptyTile.position + 4)
+            ]
+
             randomTiles = randomTiles.filter(item => {
                 if (item.position) {
                     return item
