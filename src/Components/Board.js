@@ -114,16 +114,16 @@ class Board extends React.Component {
     }
 
     checkWin() {
-        let positionCount = 0;
+        let correctPosition = 0;
         this.state.tiles.map(item => {
             item.map(jtem => {
                 if (jtem.position === jtem.id) {
-                    positionCount++
+                    correctPosition++
                 }
             })
         })
 
-        if (positionCount === 16) {
+        if (correctPosition === 16) {
             console.log('you win!')
             this.gameWin = true;
         }
