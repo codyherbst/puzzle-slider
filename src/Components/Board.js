@@ -10,7 +10,8 @@ class Board extends React.Component {
             tiles: []
         }
         this.moveTile = this.moveTile.bind(this);
-        this.getTile = this.getTile.bind(this);
+        this.getTileByID = this.getTileByID.bind(this);
+        this.getTileByPos = this.getTileByPos.bind(this);
     }
 
     render() {
@@ -19,7 +20,7 @@ class Board extends React.Component {
                 <Tile
                     tiles={this.state.tiles}
                     moveTile={this.moveTile}
-                    getTile={this.getTile}
+                    getTileByPos={this.getTileByPos}
                 />
             </Container>
         )
@@ -27,6 +28,7 @@ class Board extends React.Component {
 
     async componentDidMount() {
         await this.buildTiles()
+        this.randomizeTiles()
     }
 
     buildTiles() {
@@ -47,32 +49,25 @@ class Board extends React.Component {
         }))
     }
 
-    async moveTile(e) {
-        e.persist();
-        e.preventDefault();
-        let currTile = this.getTile(this.state.tiles, Number(e.target.id));
+    async moveTile(e, newTile) {
+        let currTile = null;
+        if (e != null) {
+            e.persist();
+            e.preventDefault();
+            currTile = this.getTileByID(this.state.tiles, Number(e.target.id));
+        } else if (e === null) {
+            currTile = newTile
+        }
         let emptyTile = this.getEmptyTile();
 
-        // console.log(currTile)
-        // console.log(emptyTile)
+        if (currTile.position - 1 === emptyTile.position ||
+            currTile.position + 1 === emptyTile.position ||
+            currTile.position - 4 === emptyTile.position ||
+            currTile.position + 4 === emptyTile.position) {
 
-        if (currTile.position <= 3) {
-            if (currTile.position - 1 === emptyTile.position || currTile.position + 1 === emptyTile.position || currTile.position + 4 === emptyTile.position) {
-                let newPosition = emptyTile.position;
-                emptyTile.position = currTile.position;
-                currTile.position = newPosition;
-                // console.log(currTile)
-            }
-        } else if (currTile.position >= 12) {
-            if (currTile.position - 1 === emptyTile.position || currTile.position + 1 === emptyTile.position || currTile.position - 4 === emptyTile.position) {
-                let newPosition = emptyTile.position;
-                emptyTile.position = currTile.position;
-                currTile.position = newPosition;
-            }
-        } else if (currTile.position - 1 === emptyTile.position || currTile.position + 1 === emptyTile.position || currTile.position - 4 === emptyTile.position || currTile.position + 4 === emptyTile.position) {
             let newPosition = emptyTile.position;
-                emptyTile.position = currTile.position;
-                currTile.position = newPosition;
+            emptyTile.position = currTile.position;
+            currTile.position = newPosition;
         }
 
         await this.setState(prevState => ({
@@ -88,14 +83,31 @@ class Board extends React.Component {
                 })
                 return item;
             })
-
-
-            // console.log(currTile)
-            // console.log(leftTile)
         }))
     }
 
-    getTile(array, id) {
+    randomizeTiles() {
+        let emptyTile = this.getEmptyTile()
+
+        for (let i = 0; i < 100; i++) {
+            let leftTile = this.getTileByPos(this.state.tiles, emptyTile.position - 1)
+            let rightTile = this.getTileByPos(this.state.tiles, emptyTile.position + 1)
+            let topTile = this.getTileByPos(this.state.tiles, emptyTile.position - 4)
+            let botTile = this.getTileByPos(this.state.tiles, emptyTile.position + 4)
+
+            let randomTiles = [leftTile, rightTile, topTile, botTile]
+            randomTiles = randomTiles.filter(item => {
+                if (item.position) {
+                    return item
+                }
+            })
+
+            let randomTile = randomTiles[Math.floor(Math.random() * Math.floor(randomTiles.length))];
+            this.moveTile(null, randomTile)
+        }
+    }
+
+    getTileByID(array, id) {
         let currTile = {};
         array.map((item) => {
             item.map(jtem => {
@@ -105,6 +117,19 @@ class Board extends React.Component {
             })
         })
         return currTile;
+    }
+
+    getTileByPos(array, position) {
+        let currTile = {}
+        array.map((item) => {
+            item.map(jtem => {
+                if (jtem.position === position) {
+                    currTile = jtem
+                }
+            })
+        })
+        // console.log(currTile)
+        return currTile
     }
 
     getEmptyTile() {

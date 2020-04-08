@@ -15,10 +15,10 @@ class Tile extends React.Component {
                             <React.Fragment>
                                 < Col
                                     className='border'
-                                    id={this.getTile(this.props.tiles, currPosition).id}
+                                    id={this.props.getTileByPos(this.props.tiles, currPosition).id}
                                     key={j} onClick={this.props.moveTile}
                                 >
-                                    {this.getTile(this.props.tiles, currPosition).text}
+                                    {this.props.getTileByPos(this.props.tiles, currPosition).text}
                                 </Col>
                                 <div className='d-none'>{currPosition++}</div>
                             </React.Fragment>
