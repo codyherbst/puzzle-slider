@@ -7,8 +7,9 @@ class Board extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tiles: []
+            tiles: [],
         }
+        this.gameWin = false;
         this.moveTile = this.moveTile.bind(this);
         this.getTileByID = this.getTileByID.bind(this);
         this.getTileByPos = this.getTileByPos.bind(this);
@@ -29,6 +30,10 @@ class Board extends React.Component {
     async componentDidMount() {
         await this.buildTiles()
         this.randomizeTiles()
+    }
+
+    componentDidUpdate() {
+        this.checkWin();
     }
 
     buildTiles() {
@@ -75,7 +80,6 @@ class Board extends React.Component {
                 item.map(jtem => {
                     if (jtem.id === currTile.id) {
                         jtem.position = currTile.position;
-                        // console.log(currTile.position)
                     } else if (jtem.id === emptyTile.id) {
                         jtem.position = emptyTile.position;
                     }
@@ -89,7 +93,7 @@ class Board extends React.Component {
     randomizeTiles() {
         let emptyTile = this.getEmptyTile()
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1; i++) {
             let leftTile = this.getTileByPos(this.state.tiles, emptyTile.position - 1)
             let rightTile = this.getTileByPos(this.state.tiles, emptyTile.position + 1)
             let topTile = this.getTileByPos(this.state.tiles, emptyTile.position - 4)
@@ -104,6 +108,22 @@ class Board extends React.Component {
 
             let randomTile = randomTiles[Math.floor(Math.random() * Math.floor(randomTiles.length))];
             this.moveTile(null, randomTile)
+        }
+    }
+
+    checkWin() {
+        let positionCount = 0;
+        this.state.tiles.map(item => {
+            item.map(jtem => {
+                if (jtem.position === jtem.id) {
+                    positionCount++
+                }
+            })
+        })
+
+        if (positionCount === 16) {
+            console.log('you win!')
+            this.gameWin = true;
         }
     }
 
@@ -128,7 +148,6 @@ class Board extends React.Component {
                 }
             })
         })
-        // console.log(currTile)
         return currTile
     }
 

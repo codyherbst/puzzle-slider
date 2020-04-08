@@ -5,6 +5,7 @@ class Tile extends React.Component {
     constructor(props) {
         super(props)
     }
+    
     render() {
         let currPosition = 0
         return (
@@ -29,23 +30,6 @@ class Tile extends React.Component {
                 }
             </Container >
         )
-    }
-
-    componentDidMount() {
-
-    }
-
-    getTile(array, position) {
-        let currTile = {}
-        array.map((item) => {
-            item.map(jtem => {
-                if (jtem.position === position) {
-                    currTile = jtem
-                }
-            })
-        })
-        // console.log(currTile)
-        return currTile
     }
 }
 
