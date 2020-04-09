@@ -29,7 +29,7 @@ class Board extends React.Component {
 
     async componentDidMount() {
         await this.buildTiles()
-        this.randomizeTiles()
+        await this.randomizeTiles()
     }
 
     componentDidUpdate() {
@@ -39,13 +39,22 @@ class Board extends React.Component {
     buildTiles() {
         let newTiles = [];
         let newTile = [];
+        let row = 0;
         for (var i = 0; i < 16; i++) {
-            let currTile = { position: i, text: i, id: i, isEmpty: ((i === 0) ? true : false) };
+            let currTile = {
+                position: i,
+                text: i,
+                id: i,
+                isEmpty: ((i === 0) ? true : false),
+                padLeft: (i % 4),
+                padTop: row
+            };
 
             newTile.push(currTile)
             if ((i + 1) % 4 === 0) {
                 newTiles.push(newTile);
                 newTile = [];
+                row++
             }
 
         }
@@ -60,6 +69,7 @@ class Board extends React.Component {
             e.persist();
             e.preventDefault();
             currTile = this.getTileByID(this.state.tiles, Number(e.target.id));
+            console.log(this.state.tiles, Number(e.target.id))
         } else if (e === null) {
             currTile = newTile
         }
@@ -88,12 +98,14 @@ class Board extends React.Component {
                 return item;
             })
         }))
+
+        // this.checkWin();
     }
 
     randomizeTiles() {
         let emptyTile = this.getEmptyTile()
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 0; i++) {
 
             let randomTiles = [
                 this.getTileByPos(this.state.tiles, emptyTile.position - 1),
