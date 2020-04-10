@@ -8,8 +8,9 @@ class Board extends React.Component {
         super(props);
         this.state = {
             tiles: [],
+            imgURL: ''
         }
-        this.gameWin = false;
+        this.gameOn = false;
         this.moveTile = this.moveTile.bind(this);
         this.getTileByID = this.getTileByID.bind(this);
         this.getTileByPos = this.getTileByPos.bind(this);
@@ -18,40 +19,57 @@ class Board extends React.Component {
     render() {
         return (
             <Container>
+                <form onChange={this.setImage.bind(this)}>
+                    <input type="file" id="myFile" name="filename" />
+                </form>
+
                 <Tile
                     tiles={this.state.tiles}
                     moveTile={this.moveTile}
                     getTileByPos={this.getTileByPos}
+                    imgURL={this.state.imgURL}
                 />
+
+                <button onClick={this.randomizeTiles.bind(this)}>Randomize</button>
+                <button onClick={this.buildTiles.bind(this)}>Reset</button>
             </Container>
         )
     }
 
     async componentDidMount() {
         await this.buildTiles()
-        this.randomizeTiles()
     }
 
     componentDidUpdate() {
-        this.checkWin();
+        if (this.gameOn) {
+            this.checkWin();
+        }
     }
 
     buildTiles() {
         let newTiles = [];
         let newTile = [];
+        let row = 0;
         for (var i = 0; i < 16; i++) {
-            let currTile = { position: i, text: i, id: i, isEmpty: ((i === 0) ? true : false) };
+            let currTile = {
+                position: i,
+                id: i,
+                isEmpty: ((i === 0) ? true : false),
+                padLeft: (i % 4),
+                padTop: row
+            };
 
             newTile.push(currTile)
             if ((i + 1) % 4 === 0) {
                 newTiles.push(newTile);
                 newTile = [];
+                row++
             }
-
         }
         this.setState(prevState => ({
             tiles: newTiles
         }))
+        this.gameOn=false;
     }
 
     async moveTile(e, newTile) {
@@ -60,6 +78,8 @@ class Board extends React.Component {
             e.persist();
             e.preventDefault();
             currTile = this.getTileByID(this.state.tiles, Number(e.target.id));
+            console.log(this.state.tiles, Number(e.target.id))
+            this.gameOn = true;
         } else if (e === null) {
             currTile = newTile
         }
@@ -88,18 +108,22 @@ class Board extends React.Component {
                 return item;
             })
         }))
+
+        // this.checkWin();
     }
 
     randomizeTiles() {
         let emptyTile = this.getEmptyTile()
 
-        for (let i = 0; i < 1; i++) {
-            let leftTile = this.getTileByPos(this.state.tiles, emptyTile.position - 1)
-            let rightTile = this.getTileByPos(this.state.tiles, emptyTile.position + 1)
-            let topTile = this.getTileByPos(this.state.tiles, emptyTile.position - 4)
-            let botTile = this.getTileByPos(this.state.tiles, emptyTile.position + 4)
+        for (let i = 0; i < 100; i++) {
 
-            let randomTiles = [leftTile, rightTile, topTile, botTile]
+            let randomTiles = [
+                this.getTileByPos(this.state.tiles, emptyTile.position - 1),
+                this.getTileByPos(this.state.tiles, emptyTile.position + 1),
+                this.getTileByPos(this.state.tiles, emptyTile.position - 4),
+                this.getTileByPos(this.state.tiles, emptyTile.position + 4)
+            ]
+
             randomTiles = randomTiles.filter(item => {
                 if (item.position) {
                     return item
@@ -112,19 +136,28 @@ class Board extends React.Component {
     }
 
     checkWin() {
-        let positionCount = 0;
+        let correctPosition = 0;
         this.state.tiles.map(item => {
             item.map(jtem => {
                 if (jtem.position === jtem.id) {
-                    positionCount++
+                    correctPosition++
                 }
             })
         })
 
-        if (positionCount === 16) {
+        if (correctPosition === 16) {
             console.log('you win!')
-            this.gameWin = true;
+            this.gameOn = true;
         }
+    }
+
+    async setImage(e) {
+        let input = e.target.files[0]
+        console.log(input)
+
+        await this.setState({
+            imgURL: URL.createObjectURL(input)
+        })
     }
 
     getTileByID(array, id) {
